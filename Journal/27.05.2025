@@ -3,3 +3,5 @@ Finished my second session with Three.js and learnt the basics of it including a
 I'm still thinking of how I can implement it in future projects but I think as I learn more about this library I'll explore other options.
 
 I'm very curious as to how the user interaction will go as when I look at other websites they have very cool features with spinning shapes when the user drags them.
+
+Just finised my third session where I used OrbitControls to allow camera movement and panning. I have an idea as to how I can implement it in a portfolio website with projects/certifications that I've done, so that can be fun to implement. I want to think of a final project using three.js before I end up making a portfolio website.
