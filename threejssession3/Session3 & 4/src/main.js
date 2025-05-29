@@ -15,28 +15,42 @@ light.position.set(5, 5, 5).normalize();
 scene.add(light);
 
 const textureLoader = new THREE.TextureLoader(); //Creates a texture loader instance used to load images on 3D images.
-const texture = textureLoader.load('./assets/textures/1-metal.jpg'); //Loads and uses the texture.
+const texture = textureLoader.load('./assets/textures/1-metal.jpg', (texture) => {
+  const geometry = new THREE.BoxGeometry();
+  const material = new THREE.MeshStandardMaterial({map: texture,}); //Instead of using colours, you map the texture onto the shape.
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshStandardMaterial({map: texture,}); //Instead of using colours, you map the texture onto the shape.
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+  //OrbitControls lets the user rotate/zoom/pan the camera using the mouse.
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; //Smooth camera movement.
+  controls.dampingFactor = 0.05; //How soft the movement feels.
 
-//OrbitControls lets the user rotate/zoom/pan the camera using the mouse.
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; //Smooth camera movement.
-controls.dampingFactor = 0.05; //How soft the movement feels.
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  
+  window.addEventListener('click', (event) => {
+    // Convert mouse position to normalized device coordinates
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-function animate() {
-  requestAnimationFrame(animate);
+    raycaster.setFromCamera(mouse, camera);
 
-  controls.update(); //Required for damping to work; updates the camera on each frame.
-  renderer.render(scene, camera);
-}
-animate();
+    const intersects = raycaster.intersectObjects(scene.children);
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-})
+    // If the cube is clicked, change its color
+    if (intersects.length > 0) {
+      const clickedObject = intersects[0].object;
+      clickedObject.material.color.set(Math.random() * 0xffffff);
+    }});
+
+    
+    function animate() {
+      requestAnimationFrame(animate);
+
+      controls.update(); //Required for damping to work; updates the camera on each frame.
+      renderer.render(scene, camera);
+    }
+
+    animate();
+}); //Loads and uses the texture.
