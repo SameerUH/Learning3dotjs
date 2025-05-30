@@ -28,6 +28,13 @@ const texture = textureLoader.load('./assets/textures/1-metal.jpg', (texture) =>
 
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
+
+  //Handles window resize to keep aspect ratio correct.
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();//Recalculate the camera.
+    renderer.setSize(window.innerWidth, window.innerHeight);//Resize the canvas
+  });
   
   window.addEventListener('click', (event) => {
     // Convert mouse position to normalized device coordinates
@@ -44,7 +51,6 @@ const texture = textureLoader.load('./assets/textures/1-metal.jpg', (texture) =>
       clickedObject.material.color.set(Math.random() * 0xffffff);
     }});
 
-    
     function animate() {
       requestAnimationFrame(animate);
 
