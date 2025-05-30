@@ -12,28 +12,34 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true; //Shadows won't work without this.
 document.body.appendChild(renderer.domElement);
 
+
+//Creates a large plane that receives the shadow.
 const planeGeometry = new THREE.PlaneGeometry(10,10);
-const planeMaterial = new THREE.ShadowMaterial({opacity: 0.3});
+const planeMaterial = new THREE.ShadowMaterial({opacity: 0.3}); //Transparent shadow receiver.
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.rotation.x = -Math.PI / 2;
-plane.position.y = -1;
-plane.receiveShadow = true;
+plane.rotation.x = -Math.PI / 2; //Rotate flat like a floor.
+plane.position.y = -1; //Move it down below the cube.
+plane.receiveShadow = true; //Allows shadows to appear on the plane.
 scene.add(plane);
 
+
+//Creates a directional light.
 const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(5, 10, 5);
-light.castShadow = true;
+light.position.set(5, 10, 5); //Positions the light source.
+light.castShadow = true; //Lets the light cast shadows.
 scene.add(light);
 
+
+//Creates a cube that will cast a shadow.
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshStandardMaterial({color: 0x00ff00});
-const cube = new THREE.Mesh(geometry, material);
-cube.castShadow = true;
-cube.receiveShadow = true;
+const cube = new THREE.Mesh(geometry, material); //Allow the cube to cast a shadow.
+cube.castShadow = true; //Allow the cube to cast a shadow.
+cube.receiveShadow = true; //Optional: cube can shadow itself.
 scene.add(cube);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+controls.enableDamping = true; //Smooth camera motion.
 controls.dampingFactor = 0.05;
 
 function animate() {
