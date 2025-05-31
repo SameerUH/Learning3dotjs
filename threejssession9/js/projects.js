@@ -21,20 +21,24 @@ scene.add(light);
 
 //Defines the projects with names and URLs in an array.
 const projects = [
-    {name: 'Project 1', url: 'https://w23002216.nuwebspace.co.uk/website/index.php'},
-    {name: 'Project 2', url: 'https://w23002216.nuwebspace.co.uk/gratithink/app/'},
-    {name: 'Project 3', url: 'https://w23002216.nuwebspace.co.uk/THREEDOTJS/Session7/'}
-];
+    {name: 'Project 1', url: 'https://w23002216.nuwebspace.co.uk/website/index.php', image: './assets/thumbnails/website.jpg'},
+    {name: 'Project 2', url: 'https://w23002216.nuwebspace.co.uk/gratithink/app/', image: './assets/thumbnails/app.jpg'},
+    {name: 'Project 3', url: 'https://w23002216.nuwebspace.co.uk/THREEDOTJS/Session7/', image: './assets/thumbnails/session7.jpg'}
+]; //Added the file locations for the images to be used as textures.
+
+const loader = new THREE.TextureLoader(); //Creates a texture loader.
 
 //For each project, create a cube and assign data.
 projects.forEach((project, index) => {
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshStandardMaterial({ color: new THREE.Color(`hsl(${index * 100}, 100%, 50%)`)}); //Unique colour per cube.
-    const cube = new THREE.Mesh(geometry, material);
-    cube.position.x = index * 2 - (projects.length - 1); //Spaces them in a row.
-    cube.userData = {url: project.url, name: project.name}; //Stores the URL in the objects to function later.
+    loader.load(project.image, (texture) => { //Runs when the image is loaded.
+        const geometry = new THREE.BoxGeometry(1, 1, 0.2); //Creates a thinner box geometry, kinda like a frame.
+        const material = new THREE.MeshStandardMaterial({map: texture}); //Apply the loaded texture from the projects array.
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.x = index * 2 - (projects.length - 1); //Spaces them in a row.
+        cube.userData = {url: project.url, name: project.name}; //Stores the URL in the objects to function later.
     scene.add(cube);
-})
+    });
+});
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
