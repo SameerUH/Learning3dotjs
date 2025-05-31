@@ -1,0 +1,14 @@
+#projects-showcase {
+    width: 50%;
+    height: 400px;
+    background: #000;
+    margin: auto; /*Centers the canvas (THREE.JS ELEMENT)*/
+}
+
+canvas {
+    display: block;
+}
+
+body {
+    text-align: center;
+}
