@@ -21,6 +21,9 @@ const texture = textureLoader.load('./assets/textures/1-metal.jpg', (texture) =>
   const geometry = new THREE.BoxGeometry();
   const material = new THREE.MeshStandardMaterial({map: texture,}); //Instead of using colours, you map the texture onto the shape.
   const cube = new THREE.Mesh(geometry, material);
+  cube.userData = {
+    url: 'https://w23002216.nuwebspace.co.uk/website/index.php' //Stores a custom link in the cube.
+  };
   scene.add(cube);
 
   //OrbitControls lets the user rotate/zoom/pan the camera using the mouse.
@@ -30,18 +33,17 @@ const texture = textureLoader.load('./assets/textures/1-metal.jpg', (texture) =>
 
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
+  let hovered = null;
 
-  //Handles window resize to keep aspect ratio correct.
-  window.addEventListener('resize', () => {
-    const width = container.clientWidth; //The visible width of the div element.
-    const height = container.clientHeight; //The visible height of the div element.
-    camera.aspect = width/height; //Updates the aspect ratio based on the variables set before.
-    camera.updateProjectionMatrix(); //Recalculate the camera.
-    renderer.setSize(width, height); //Resize the canvas
+  //Listens for clicks and open's the cube's link in a new tab when clicked.
+  window.addEventListener('click', () => {
+    if (hovered && hovered.userData.url) { //Logical safety check.
+      window.open(hovered.userData.url, '_blank'); //JavaScript function that tells the browser to open a new tab.
+    }
   });
-  
-  window.addEventListener('click', (event) => {
 
+  //Highlights the cube when mouse hovers over it.
+  window.addEventListener('mousemove', (event) => {
     const bounds = container.getBoundingClientRect(); //Gets canvas position on the screen.
 
     // Convert mouse position to normalized device coordinates
@@ -52,18 +54,36 @@ const texture = textureLoader.load('./assets/textures/1-metal.jpg', (texture) =>
 
     const intersects = raycaster.intersectObjects(scene.children);
 
-    // If the cube is clicked, change its color
-    if (intersects.length > 0) {
-      const clickedObject = intersects[0].object;
-      clickedObject.material.color.set(Math.random() * 0xffffff);
-    }});
-
-    function animate() {
-      requestAnimationFrame(animate);
-
-      controls.update(); //Required for damping to work; updates the camera on each frame.
-      renderer.render(scene, camera);
+    // If hovering over a new object.
+    if (intersects.length > 0) { //Checks if the raycaster hits anything.
+      const target = intersects[0].object; //Gets the closest object that was hit by the ray.
+      if (hovered !== target) { //Checks if the object is different than the one hovered before.
+        if (hovered) hovered.material.emissive.set(0x000000); //Reset old one.
+        hovered = target; //Updates the reference.
+        hovered.material.emissive.set(0x444444); //Highlight new one.
+      }
+    } else if (hovered) { //If no object is hovered (Remember hovered is null).
+      hovered.material.emissive.set(0x000000); //If not hovering any object, remove highlight.
+      hovered = null;
     }
+    });
 
-    animate();
-}); //Loads and uses the texture.
+  //Handles window resize to keep aspect ratio correct.
+  window.addEventListener('resize', () => {
+    const width = container.clientWidth; //The visible width of the div element.
+    const height = container.clientHeight; //The visible height of the div element.
+    camera.aspect = width/height; //Updates the aspect ratio based on the variables set before.
+    camera.updateProjectionMatrix(); //Recalculate the camera.
+    renderer.setSize(width, height); //Resize the canvas
+  });
+  
+  //Render loop.
+  function animate() {
+    requestAnimationFrame(animate);
+
+    controls.update(); //Required for damping to work; updates the camera on each frame.
+    renderer.render(scene, camera);
+  }
+
+  animate(); //Loads and uses the texture.
+  });
