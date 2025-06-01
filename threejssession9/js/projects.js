@@ -31,12 +31,22 @@ const loader = new THREE.TextureLoader(); //Creates a texture loader.
 //For each project, create a cube and assign data.
 projects.forEach((project, index) => {
     loader.load(project.image, (texture) => { //Runs when the image is loaded.
-        const geometry = new THREE.BoxGeometry(1, 1, 0.2); //Creates a thinner box geometry, kinda like a frame.
-        const material = new THREE.MeshStandardMaterial({map: texture}); //Apply the loaded texture from the projects array.
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.x = index * 2 - (projects.length - 1); //Spaces them in a row.
-        cube.userData = {url: project.url, name: project.name}; //Stores the URL in the objects to function later.
-    scene.add(cube);
+        const imageGeometry = new THREE.BoxGeometry(1, 1, 0.5); //Creates the project image cube.
+        const imageMaterial = new THREE.MeshStandardMaterial({map: texture});
+        const imageMesh = new THREE.Mesh(imageGeometry, imageMaterial);
+
+        const frameGeometry = new THREE.BoxGeometry(1.1, 1.1, 0.6); //Creates a cube slightly larger than the image (for visual styling).
+        const frameMaterial = new THREE.MeshStandardMaterial({color: 0x00ff00});
+        const frameMesh = new THREE.Mesh(frameGeometry, frameMaterial);
+        frameMesh.position.z = -0.06; //Push it behind the image so it shows a border.
+
+        //Group both the image and frame together into a single clickable unit.
+        const group = new THREE.Group();
+        group.add(frameMesh); //Add frame first.
+        group.add(imageMesh); //Add image next.
+        group.position.x = index * 2 - (projects.length - 1); //Spaces them in a row.
+        group.userData = {url: project.url, name: project.name}; //Stores the URL in the objects to function later.
+    scene.add(group);
     });
 });
 
@@ -49,9 +59,28 @@ const mouse = new THREE.Vector2();
 let hovered = null; //Keeps track of the currently hovered object.
 
 //Click handler which opens the project's link.
-window.addEventListener('click', () => {
-    if (hovered && hovered.userData.url) {
-        window.open(hovered.userData.url, '_blank'); //Opens it in a new tab.
+window.addEventListener('click', (event) => {
+    const bounds = container.getBoundingClientRect(); //Gets the coordinates of the container from the index.php file.
+
+    mouse.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+    mouse.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
+
+    //Shoots a ray to find the mouse position.
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    if (intersects.length > 0) {
+        let obj = intersects[0].object;
+
+        //Climb up the parent tree until we find the group that has a URL.
+        while (obj && !obj.userData.url) {
+            obj = obj.parent;
+        }
+
+        //If found, open it in a new tab.
+        if (obj && obj.userData.url) {
+            window.open(obj.userData.url, '_blank');
+        }
     }
 });
 
@@ -63,17 +92,17 @@ window.addEventListener('mousemove', (event) => {
     mouse.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(scene.children);
+    const intersects = raycaster.intersectObjects(scene.children, true);
 
     if (intersects.length > 0) {
         const target = intersects[0].object;
         if (hovered !== target) {
-            if (hovered) hovered.material.emissive.set(0x000000); //Remove highlight from previous.
+            if (hovered) hovered.material.emissive.set(0x111111); //Remove highlight from previous.
             hovered = target;
             hovered.material.emissive.set(0x444444); //Add soft highlights.
         }
     } else if (hovered) {
-        hovered.material.emissive.set(0x000000); //Reset highlight.
+        hovered.material.emissive.set(0x111111); //Reset highlight.
         hovered = null;
     }
 });
