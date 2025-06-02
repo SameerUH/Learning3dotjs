@@ -86,6 +86,8 @@ window.addEventListener('click', (event) => {
 });
 
 
+let hoveredGroup = null; //Keeps track of currently scaled object.
+
 //Mouse move handler which highlights the hovered cube.
 window.addEventListener('mousemove', (event) => {
     const bounds = container.getBoundingClientRect(); //Gets the canvas bounds.
@@ -106,9 +108,24 @@ window.addEventListener('mousemove', (event) => {
         if (object && object.userData.name) { //If it's a valid object with a name we found...
             tooltip.style.display = 'block'; //Show the tooltip.
             tooltip.textContent = `Name: ${object.userData.name}. URL: ${object.userData.url}`; //Sets it's text to the project name and URL..
-            tooltip.style.left = `${event.clientX + 10}px`; //Move it next to the ouse.
+            tooltip.style.left = `${event.clientX + 10}px`; //Move it next to the mouse.
             tooltip.style.top = `${event.clientY + 10}px`;
+  
+        //Reset scale of the previous hovered object if you have moved to a different object.
+        if (hoveredGroup && hoveredGroup !== object) {
+            hoveredGroup.scale.set(1, 1, 1);
         }
+
+        //Scale the new object.
+        hoveredGroup = object;
+        hoveredGroup.scale.set(1.1, 1.1, 1.1); //Slightly larger for highlight.
+    } else {
+        if (hoveredGroup) {
+            hoveredGroup.scale.set(1, 1, 1); //Reset scale if not hovering over anything.
+        }
+        hoveredGroup = null; //Resets the hoveredGroup when mouse is hovered over nothing.
+        tooltip.style.display = 'none';
+    }
 
         if (hovered !== target) {
             if (hovered) hovered.material.emissive.set(0x111111); //Remove highlight from previous.
