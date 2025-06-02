@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {OrbitControls} from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 
 const container = document.getElementById('projects-showcase'); //Gets the container to attach the 3D canvas.
+const tooltip = document.getElementById('tooltip'); //Gets the tooltip to be put on the 3D cubes.
 
 const scene = new THREE.Scene();
 
@@ -21,9 +22,9 @@ scene.add(light);
 
 //Defines the projects with names and URLs in an array.
 const projects = [
-    {name: 'Project 1', url: 'https://w23002216.nuwebspace.co.uk/website/index.php', image: './assets/thumbnails/website.jpg'},
-    {name: 'Project 2', url: 'https://w23002216.nuwebspace.co.uk/gratithink/app/', image: './assets/thumbnails/app.jpg'},
-    {name: 'Project 3', url: 'https://w23002216.nuwebspace.co.uk/THREEDOTJS/Session7/', image: './assets/thumbnails/session7.jpg'}
+    {name: 'Gratithink Website', url: 'https://w23002216.nuwebspace.co.uk/website/index.php', image: './assets/thumbnails/website.jpg'},
+    {name: 'Gratithink App', url: 'https://w23002216.nuwebspace.co.uk/gratithink/app/', image: './assets/thumbnails/app.jpg'},
+    {name: 'Three.js Session 7', url: 'https://w23002216.nuwebspace.co.uk/THREEDOTJS/Session7/', image: './assets/thumbnails/session7.jpg'}
 ]; //Added the file locations for the images to be used as textures.
 
 const loader = new THREE.TextureLoader(); //Creates a texture loader.
@@ -95,15 +96,29 @@ window.addEventListener('mousemove', (event) => {
     const intersects = raycaster.intersectObjects(scene.children, true);
 
     if (intersects.length > 0) {
-        const target = intersects[0].object;
+        const target = intersects[0].object; //Get the first object the mouse is hovering over.
+
+        let object = target;
+        while (object && !object.userData.name) { //Climb up the parent chain to find the group that has the name stored in it's userData.
+            object = object.parent;
+        }
+
+        if (object && object.userData.name) { //If it's a valid object with a name we found...
+            tooltip.style.display = 'block'; //Show the tooltip.
+            tooltip.textContent = `Name: ${object.userData.name}. URL: ${object.userData.url}`; //Sets it's text to the project name and URL..
+            tooltip.style.left = `${event.clientX + 10}px`; //Move it next to the ouse.
+            tooltip.style.top = `${event.clientY + 10}px`;
+        }
+
         if (hovered !== target) {
             if (hovered) hovered.material.emissive.set(0x111111); //Remove highlight from previous.
             hovered = target;
             hovered.material.emissive.set(0x444444); //Add soft highlights.
         }
-    } else if (hovered) {
+    } else if (hovered) { 
         hovered.material.emissive.set(0x111111); //Reset highlight.
         hovered = null;
+        tooltip.style.display = 'none'; //If nothing is hovered, then hide the tooltip.
     }
 });
 
