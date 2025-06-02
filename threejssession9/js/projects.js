@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import {OrbitControls} from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 
 const container = document.getElementById('projects-showcase'); //Gets the container to attach the 3D canvas.
 const tooltip = document.getElementById('tooltip'); //Gets the tooltip to be put on the 3D cubes.
@@ -7,8 +6,9 @@ const tooltip = document.getElementById('tooltip'); //Gets the tooltip to be put
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-camera.position.z = 5;
-
+let currentZ = 5; //Starting Z position.
+let scrollTargetZ = currentZ; //Scroll destination Z position.
+camera.position.z = currentZ;
 
 //Creates the renderer and attaches it to the container.
 const renderer = new THREE.WebGLRenderer({antialias: true});
@@ -45,15 +45,11 @@ projects.forEach((project, index) => {
         const group = new THREE.Group();
         group.add(frameMesh); //Add frame first.
         group.add(imageMesh); //Add image next.
-        group.position.x = index * 2 - (projects.length - 1); //Spaces them in a row.
+        group.position.z = -index * 5; //Spaces them in a row.
         group.userData = {url: project.url, name: project.name}; //Stores the URL in the objects to function later.
     scene.add(group);
     });
 });
-
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -149,9 +145,22 @@ window.addEventListener('resize', () => {
     renderer.setSize(width, height);
 });
 
+//Listens to the scroll wheel event.
+window.addEventListener('wheel', (event) => {
+    event.preventDefault();
+
+    const travelSpeed = 0.25;
+    scrollTargetZ += event.deltaY * 0.01 * travelSpeed; //Adjust scroll target.
+
+    const minZ = -((projects.length - 1) * 5 + 2); //Clamp Z range so user doesn't scroll too far.
+    const maxZ = 5;
+    scrollTargetZ = Math.min(maxZ, Math.max(minZ, scrollTargetZ));
+}, {passive:false});
+
 function animate() {
     requestAnimationFrame(animate);
-    controls.update();
     renderer.render(scene, camera);
+    currentZ += (scrollTargetZ - currentZ) * 0.05; //Smoothly interpolates to the target Z position.
+    camera.position.z = currentZ;
 }
 animate();

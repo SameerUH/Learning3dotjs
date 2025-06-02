@@ -24,4 +24,7 @@ canvas {
 
 body {
     text-align: center;
+    height: 300vh; /* Makes the page 3x the height of the screen */
+    margin: 0;
+    overflow-y: scroll;
 }
