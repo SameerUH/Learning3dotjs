@@ -21,6 +21,12 @@
 
     <div id="projects-showcase"></div>
 
+    <div id="nav">
+        <button data-project="-1">Project 1</button>
+        <button data-project="0">Project 2</button>
+        <button data-project="1">Project 3</button>
+    </div>
+
     <script type="module" src="./js/projects.js"></script>
 </body>
 </html>

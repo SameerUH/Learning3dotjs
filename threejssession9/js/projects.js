@@ -157,6 +157,15 @@ window.addEventListener('wheel', (event) => {
     scrollTargetZ = Math.min(maxZ, Math.max(minZ, scrollTargetZ));
 }, {passive:false});
 
+
+//Select all navigation buttons.
+document.querySelectorAll('#nav button').forEach(btn => {
+    btn.addEventListener('click', () => { //Adds a click event to each button.
+        const index = parseInt(btn.dataset.project); //Gets the index of the project from the button's data-project attribute.
+        scrollTargetZ = (index * -5) - 4; //Set the target Z position of the camera just in front of the cube.
+    });
+});
+
 function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
