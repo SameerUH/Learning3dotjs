@@ -45,8 +45,10 @@ projects.forEach((project, index) => {
         const group = new THREE.Group();
         group.add(frameMesh); //Add frame first.
         group.add(imageMesh); //Add image next.
-        group.position.z = -index * 5; //Spaces them in a row.
+        group.position.z = -index * 5 - 10; //Spaces them in a row.
+        group.scale.set(0.5, 0.5, 0.5); //Starts smaller.
         group.userData = {url: project.url, name: project.name}; //Stores the URL in the objects to function later.
+        group.userData.finalZ = -index * 5; //Target/end position of the cubes.
     scene.add(group);
     });
 });
@@ -171,5 +173,14 @@ function animate() {
     renderer.render(scene, camera);
     currentZ += (scrollTargetZ - currentZ) * 0.05; //Smoothly interpolates to the target Z position.
     camera.position.z = currentZ;
+    
+    scene.children.forEach(object => {
+        if (object.userData.finalZ !== undefined) {
+            object.position.z += (object.userData.finalZ - object.position.z) * 0.05;
+
+            const scale = object.scale.x + (1 - object.scale.x) * 0.05;
+            object.scale.set(scale, scale, scale);
+        }
+    });
 }
 animate();
