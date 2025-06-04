@@ -4,6 +4,8 @@ const container = document.getElementById('projects-showcase'); //Gets the conta
 const tooltip = document.getElementById('tooltip'); //Gets the tooltip to be put on the 3D cubes.
 
 const scene = new THREE.Scene();
+//scene.background = new THREE.Color(0x222222); Can be used to set a background colour.
+
 
 const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
 let currentZ = 5; //Starting Z position.
@@ -28,6 +30,10 @@ const projects = [
 ]; //Added the file locations for the images to be used as textures.
 
 const loader = new THREE.TextureLoader(); //Creates a texture loader.
+
+loader.load('./assets/thumbnails/background.jpg', texture => { //Loads the background image from your folder.
+    scene.background = texture; //Once loaded, set it as the scene's background.
+});
 
 //For each project, create a cube and assign data.
 projects.forEach((project, index) => {
