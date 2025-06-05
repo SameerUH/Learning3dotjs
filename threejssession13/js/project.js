@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import { FontLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'https://unpkg.com/three@0.160.0/examples/jsm/geometries/TextGeometry.js';
 
 
 const container = document.getElementById('lighting');
@@ -27,7 +29,7 @@ loader.load('./assets/thumbnails/1-metal.jpg', (texture) => {
     const material = new THREE.MeshStandardMaterial({map: texture});
     const sphere = new THREE.Mesh(geometry, material);
     sphere.castShadow = true; //Enables casting shadows.
-    //sphere.position.y = 0; Optional and ensures it's above the floor.
+    sphere.position.y = 10; //Optional and ensures it's above the floor.
     scene.add(sphere);
 });
 
@@ -95,6 +97,38 @@ scene.add(spotlight);
 
 const spotlightHelper = new THREE.SpotLightHelper(spotlight); //Shows a grid which displays the cone.
 //scene.add(spotlightHelper)
+
+//Text
+const textloader = new FontLoader();
+const letterSpacing = 0.47;
+const text = "SAMEER HAQ";
+
+const video = document.createElement('video');
+video.src = './assets/thumbnails/lettertexture.mp4';
+video.loop = true;
+video.muted = true;
+video.play();
+
+const videoTexture = new THREE.VideoTexture(video);
+videoTexture.minFilter = THREE.LinearFilter;
+videoTexture.magFilter = THREE.LinearFilter;
+videoTexture.format = THREE.RGBAFormat;
+
+
+textloader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', (font) => {
+    [...text].forEach((char, i) => {
+        const textgeometry = new TextGeometry(char, {
+            font: font, size: 0.5, height: 0.2, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.02, bevelSegments: 5, 
+        });
+
+        const textmaterial = new THREE.MeshStandardMaterial({map: videoTexture});
+        const textMesh = new THREE.Mesh(textgeometry, textmaterial);
+        textMesh.position.x = i * letterSpacing;
+        textMesh.castShadow = true;
+        scene.add(textMesh);
+    });
+});
+
 
 function animate() {
     requestAnimationFrame(animate);
