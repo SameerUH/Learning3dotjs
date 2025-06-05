@@ -5,6 +5,7 @@ import {OrbitControls} from 'https://unpkg.com/three@0.160.0/examples/jsm/contro
 const container = document.getElementById('lighting');
 
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeeeeee);
 
 const camera = new THREE.PerspectiveCamera(75, container.clientWidth /container.clientHeight, 0.1, 1000);
 camera.position.z = 5;
@@ -12,6 +13,9 @@ camera.position.z = 5;
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(container.clientWidth, container.clientHeight);
 container.appendChild(renderer.domElement);
+renderer.shadowMap.enabled = true; //Enables shadow in the renderer.
+renderer.shadowMap.type = THREE.PCFShadowMap; //Softer edges.
+
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -22,6 +26,8 @@ loader.load('./assets/thumbnails/1-metal.jpg', (texture) => {
     const geometry = new THREE.SphereGeometry(1, 32, 32);
     const material = new THREE.MeshStandardMaterial({map: texture});
     const sphere = new THREE.Mesh(geometry, material);
+    sphere.castShadow = true; //Enables casting shadows.
+    //sphere.position.y = 0; Optional and ensures it's above the floor.
     scene.add(sphere);
 });
 
@@ -47,6 +53,27 @@ const lightIndicator = new THREE.Mesh(
 );
 lightIndicator.position.copy(point.position); //Copies the position of the point light into the small sphere that it represents visually.
 scene.add(lightIndicator);
+
+directional.castShadow = true;
+directional.shadow.mapSize.width = 1024; //Sets the resolution of the shadow map with height and width.
+directional.shadow.mapSize.height = 1024;
+directional.shadow.camera.near = 1; //Minimum distance from the light to start casting.
+directional.shadow.camera.far = 20; //Maximum distance from the light to cast shadows.
+directional.shadow.camera.left = -5; //Bounds which define how wide the shadow casting area is.
+directional.shadow.camera.right = 5;
+directional.shadow.camera.top = 5;
+directional.shadow.camera.bottom = -5;
+
+//Create a floor so we can see the shadow effect.
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(10, 10),
+    new THREE.ShadowMaterial({opacity: 0.4}) //Only shows shadows and not colour.
+);
+
+floor.rotation.x = -Math.PI / 2; //Rotates it to be horizontal.
+floor.position.y = -1; //Lowers it beneath the sphere.
+floor.receiveShadow = true; //Floor accepts shadow.
+scene.add(floor);
 
 function animate() {
     requestAnimationFrame(animate);
