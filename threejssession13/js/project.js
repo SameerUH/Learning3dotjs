@@ -54,6 +54,7 @@ const lightIndicator = new THREE.Mesh(
 lightIndicator.position.copy(point.position); //Copies the position of the point light into the small sphere that it represents visually.
 scene.add(lightIndicator);
 
+//Shadow:
 directional.castShadow = true;
 directional.shadow.mapSize.width = 1024; //Sets the resolution of the shadow map with height and width.
 directional.shadow.mapSize.height = 1024;
@@ -74,6 +75,26 @@ floor.rotation.x = -Math.PI / 2; //Rotates it to be horizontal.
 floor.position.y = -1; //Lowers it beneath the sphere.
 floor.receiveShadow = true; //Floor accepts shadow.
 scene.add(floor);
+
+//Spotlight:
+const spotlight = new THREE.SpotLight(0xffddaa, 1); //colour, intensity.
+spotlight.position.set(3, 6, 3); //Places it above and to the side.
+spotlight.target.position.set(0, 0, 0); //Aims the spotlight and adds it to the scene..
+scene.add(spotlight.target);
+
+spotlight.castShadow = true; //Enables shadows and sets dimensions.
+spotlight.shadow.mapSize.width = 1024;
+spotlight.shadow.mapSize.height = 1024;
+
+spotlight.angle = Math.PI / 6; //Cone spread.
+spotlight.penumbra = 0.2; //Softnes around the edges of the spotlight.
+spotlight.decay = 2; //Light fade-off.
+spotlight.distance = 10; //How far the light reached.
+
+scene.add(spotlight);
+
+const spotlightHelper = new THREE.SpotLightHelper(spotlight); //Shows a grid which displays the cone.
+//scene.add(spotlightHelper)
 
 function animate() {
     requestAnimationFrame(animate);
