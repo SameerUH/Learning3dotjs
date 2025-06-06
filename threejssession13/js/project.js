@@ -7,7 +7,7 @@ import { TextGeometry } from 'https://unpkg.com/three@0.160.0/examples/jsm/geome
 const container = document.getElementById('lighting');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xeeeeee);
+scene.background = new THREE.Color(0xe0f7fa);
 
 const camera = new THREE.PerspectiveCamera(75, container.clientWidth /container.clientHeight, 0.1, 1000);
 camera.position.z = 5;
